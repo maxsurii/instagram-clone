@@ -13,6 +13,8 @@ function App() {
       </div>
       {/** Posts */}
       <Post />
+      <Post />
+      <Post />
     </div>
   );
 }
