@@ -1,31 +1,32 @@
-import React,  { useState, useEffect } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import './App.css';
-import Post from './Post';
-import { db, auth } from './firebase';
-import { Modal, Button, Input } from '@material-ui/core';
+import React, { useState, useEffect } from "react";
+import { makeStyles } from "@material-ui/core/styles";
+import "./App.css";
+import Post from "./Post";
+import { db, auth } from "./firebase";
+import { Modal, Button, Input } from "@material-ui/core";
+import ImageUpload from "./ImageUpload";
 
-  function getModalStyle() {
-    const top = 50;
-    const left = 50;
+function getModalStyle() {
+  const top = 50;
+  const left = 50;
 
-    return {
-      top: `${top}%`,
-      left: `${left}%`,
-      transform: `translate(-${top}%, -${left}%)`,
-    };
-  }
+  return {
+    top: `${top}%`,
+    left: `${left}%`,
+    transform: `translate(-${top}%, -${left}%)`,
+  };
+}
 
-  const useStyles = makeStyles((theme) => ({
-    paper: {
-      position: 'absolute',
-      width: 400,
-      backgroundColor: theme.palette.background.paper,
-      border: '2px solid #000',
-      boxShadow: theme.shadows[5],
-      padding: theme.spacing(2, 4, 3),
-    },
-  }));
+const useStyles = makeStyles((theme) => ({
+  paper: {
+    position: "absolute",
+    width: 400,
+    backgroundColor: theme.palette.background.paper,
+    border: "2px solid #000",
+    boxShadow: theme.shadows[5],
+    padding: theme.spacing(2, 4, 3),
+  },
+}));
 
 function App() {
   const classes = useStyles();
@@ -34,66 +35,77 @@ function App() {
   const [openSignIn, setOpenSignIn] = useState(false);
   const [modalStyle] = useState(getModalStyle);
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
   const [user, setUser] = useState(null);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((authUser) => {
-      if(authUser) {
+      if (authUser) {
         //user logged in
         console.log(authUser);
-        setUser(authUser);//
+        setUser(authUser); //
       } else {
         // user logger out
         setUser(null);
       }
-    })
+    });
 
     return () => {
       //perform some cleanup actions
       unsubscribe();
-    }
-  }, [user, username])
+    };
+  }, [user, username]);
 
-   useEffect(() => {
-    db.collection('posts').onSnapshot(snapshot => {
+  useEffect(() => {
+    db.collection("posts").onSnapshot((snapshot) => {
       // Everytime new post is added this will triggered
-      setPosts(snapshot.docs.map(doc => ({
-        id: doc.id,
-        post: doc.data()
-      })));
-    })
+      setPosts(
+        snapshot.docs.map((doc) => ({
+          id: doc.id,
+          post: doc.data(),
+        }))
+      );
+    });
   }, [posts]);
 
   const signIn = (event) => {
     event.preventDefault();
-    auth.signInWithEmailAndPassword(email, password)
-    .then((authUser) => {
-      if (authUser){
-      setUser(authUser);//
-    } else {
-      // user logger out
-      setUser(null);
-    }
-  })    
-  }
+    auth
+      .signInWithEmailAndPassword(email, password)
+      .then((authUser) => {
+        if (authUser) {
+          setUser(authUser); //
+        } else {
+          // user logger out
+          setUser(null);
+        }
+      })
+      .catch((error) => alert(error.message));
+    setOpenSignIn(false);
+  };
 
   const signUp = (event) => {
     event.preventDefault();
     //below method will create user in firebase
-    auth.createUserWithEmailAndPassword(email, password)
-    .then((authUser) => {
-      return authUser.user.updateProfile({
-        displayName: username,
+    auth
+      .createUserWithEmailAndPassword(email, password)
+      .then((authUser) => {
+        return authUser.user.updateProfile({
+          displayName: username,
+        });
       })
-    })
-    .catch((error) => alert(error.message));
-  }
+      .catch((error) => alert(error.message));
+    setOpen(false);
+  };
 
   return (
     <div className="app">
+      {/** Caption Input */}
+    
+      <ImageUpload />
+      
       <Modal open={open} onClose={() => setOpen(false)}>
         <div style={modalStyle} className={classes.paper}>
           <form className="app__signup">
@@ -150,7 +162,6 @@ function App() {
         </div>
       </Modal>
 
-
       {/** Header */}
       <div className="app__header">
         <img
@@ -182,3 +193,4 @@ function App() {
 }
 
 export default App;
+
