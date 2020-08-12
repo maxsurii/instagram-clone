@@ -67,6 +67,18 @@ function App() {
     })
   }, [posts]);
 
+  const signIn = (event) => {
+    event.preventDefault();
+    auth.signInWithEmailAndPassword(email, password)
+    .then((authUser) => {
+      if (authUser){
+      setUser(authUser);//
+    } else {
+      // user logger out
+      setUser(null);
+    }
+  })    
+  }
 
   const signUp = (event) => {
     event.preventDefault();
@@ -112,6 +124,33 @@ function App() {
           </form>
         </div>
       </Modal>
+
+      <Modal open={openSignIn} onClose={() => setOpenSignIn(false)}>
+        <div style={modalStyle} className={classes.paper}>
+          <form className="app__signup">
+            <img
+              className="app__headerImage"
+              src="https://www.instagram.com/static/images/web/mobile_nav_type_logo.png/735145cfe0a4.png"
+              alt="Instagram"
+            />
+            <Input
+              placeholder="email"
+              type="text"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <Input
+              placeholder="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <Button onClick={signIn}>Sign In</Button>
+          </form>
+        </div>
+      </Modal>
+
+
       {/** Header */}
       <div className="app__header">
         <img
